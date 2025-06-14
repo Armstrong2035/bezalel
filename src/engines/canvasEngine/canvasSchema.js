@@ -1,5 +1,11 @@
-import { getContext } from "../../systems/memory/memoryContext.js";
-import { generateUniqueId } from "../../utils/generateId.js";
+import { getContext } from "../../services/contextService.js";
+import {
+  levels,
+  capitalOptions,
+  timeAvailabilities,
+  goals,
+  archetypes,
+} from "../decisionEngine/businessTypePathways/pathwayPrompts.js";
 
 export const canvasSegmentSchema = {
   segment: "", //e.g value proposition, customer segment, etc.
@@ -65,63 +71,32 @@ const segmentPrompts = {
   `,
 };
 
-export const createSegmentPrompt = (canvasSegment) => {
-  const context = getContext();
-  const segmentPrompt =
-    segmentPrompts[canvasSegment] || "Please specify a valid canvas segment.";
+export const createPrompt = async (contextId, segment) => {
+  try {
+    // Get context from Firestore
+    const context = await getContext(contextId);
 
-  const prompt = `
-    You are a helpful assistant that helps the user create a canvas for their business.
-    The user's idea is ${context.idea.idea}.
-    The user's experience level is ${context.experienceLevel.instruction}.
-    The user's goal is ${context.goal.instruction}.
-    The user's time availability is ${context.timeAvailability.instruction}.
-    The user's capital is ${context.capital.instruction}.
-    The user's archetype is ${context.archetype.instruction}.
+    // Build the base prompt with instructions
+    const basePrompt = `
+      You are a helpful assistant that helps the user create a canvas for their business.
+      The user's idea is ${context.idea}.
+      The user's experience level is ${levels[context.experienceLevel]}.
+      The user's goal is ${goals[context.goal]}.
+      The user's time availability is ${
+        timeAvailabilities[context.timeAvailability]
+      }.
+      The user's capital is ${capitalOptions[context.capital]}.
+      The user's archetype is ${archetypes[context.archetype]}.
+    `;
 
-    ${segmentPrompt}
-  `;
-
-  return prompt;
-};
-
-export const createPrompt = (segment) => {
-  const context = getContext();
-  const basePrompt = `
-    You are a helpful assistant that helps the user create a canvas for their business.
-    The user's idea is ${context.idea.idea}.
-    The user's experience level is ${context.experienceLevel.instruction}.
-    The user's goal is ${context.goal.instruction}.
-    The user's time availability is ${context.timeAvailability.instruction}.
-    The user's capital is ${context.capital.instruction}.
-    The user's archetype is ${context.archetype.instruction}.
-
-    Current Canvas State:
-    ${
-      context.valueProposition
-        ? `Value Proposition: ${context.valueProposition}\n`
-        : ""
+    // Add segment-specific prompt if provided
+    if (segment && segmentPrompts[segment]) {
+      return `${basePrompt}\n\n${segmentPrompts[segment]}`;
     }
-    ${
-      context.customerSegments
-        ? `Customer Segments: ${context.customerSegments}\n`
-        : ""
-    }
-    ${context.channels ? `Channels: ${context.channels}\n` : ""}
-    ${
-      context.revenueStreams
-        ? `Revenue Streams: ${context.revenueStreams}\n`
-        : ""
-    }
-    ${context.keyResources ? `Key Resources: ${context.keyResources}\n` : ""}
-    ${context.keyActivities ? `Key Activities: ${context.keyActivities}\n` : ""}
-    ${context.keyPartners ? `Key Partners: ${context.keyPartners}\n` : ""}
-    ${context.costStructure ? `Cost Structure: ${context.costStructure}\n` : ""}
-  `;
 
-  if (segment && segmentPrompts[segment]) {
-    return `${basePrompt}\n\n${segmentPrompts[segment]}`;
+    return basePrompt;
+  } catch (error) {
+    console.error("Error creating prompt:", error);
+    throw error;
   }
-
-  return basePrompt;
 };

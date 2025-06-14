@@ -4,11 +4,14 @@ import { createPrompt } from "../engines/canvasEngine/canvasSchema.js";
 
 const router = express.Router();
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const onBoardData = req.body;
-    saveToMemory(onBoardData);
-    res.json({ message: "Context saved successfully" });
+    // Hardcoded userId from our mock user
+    const userId = "mock-user-1710864000000";
+
+    const savedContext = await saveToMemory(userId, onBoardData);
+    res.status(201).json(savedContext);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
