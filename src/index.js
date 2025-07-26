@@ -35,4 +35,5 @@ const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(`Bezalel backend running on port ${PORT}`);
+  console.log(`Swagger Documentation is running on http://localhost:4000/api-docs/`)
 });

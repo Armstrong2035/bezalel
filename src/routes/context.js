@@ -14,6 +14,31 @@ import {
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Context
+ *   description: Context and Canvas management
+ */
+
+/**
+ * @swagger
+ * /api/context:
+ *   post:
+ *     summary: Save onboarding context
+ *     tags: [Context]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Context saved
+ *       500:
+ *         description: Server error
+ */
 router.post("/", async (req, res) => {
   try {
     const onBoardData = req.body;
@@ -27,6 +52,26 @@ router.post("/", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/context/canvas/prompt:
+ *   post:
+ *     summary: Generate a canvas segment using LLM
+ *     tags: [Context]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Canvas segment generated
+ *       400:
+ *         description: Missing required fields
+ *       500:
+ *         description: Server error
+ */
 router.post("/canvas/prompt", async (req, res) => {
   try {
     const { context, userId, segment } = req.body;
@@ -75,6 +120,29 @@ router.post("/canvas/prompt", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/context/canvas:
+ *   get:
+ *     summary: Get user's complete canvas
+ *     tags: [Context]
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Canvas data
+ *       400:
+ *         description: Missing userId
+ *       404:
+ *         description: No canvas found
+ *       500:
+ *         description: Server error
+ */
 // Get user's complete canvas
 router.get("/canvas", async (req, res) => {
   try {
