@@ -19,3 +19,7 @@ build/
 *.swp
 *.swo
 .DS_Store
+
+# Firebase
+service-account.json
+bezalel-firebase.json
