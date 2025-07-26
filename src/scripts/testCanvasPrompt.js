@@ -1,4 +1,3 @@
-import { encryptContext } from "../utils/encryption.js";
 import fetch from "node-fetch";
 
 const testCanvasPrompt = async () => {
@@ -12,10 +11,6 @@ const testCanvasPrompt = async () => {
       capital: "1000 - 5000",
       archetype: "Consumer Mobile App",
     };
-
-    // Encrypt the context
-    const encryptedContext = encryptContext(context);
-    console.log("Encrypted Context:", encryptedContext);
 
     // Test different segments
     const segments = [
@@ -42,7 +37,7 @@ const testCanvasPrompt = async () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            encryptedContext,
+            context,
             userId: "mock-user-1710864000000",
             segment,
           }),
@@ -50,7 +45,7 @@ const testCanvasPrompt = async () => {
       );
 
       const data = await response.json();
-      console.log("Response:", data);
+      console.log("Response:", JSON.stringify(data, null, 2));
     }
   } catch (error) {
     console.error("Error testing canvas prompt:", error);
